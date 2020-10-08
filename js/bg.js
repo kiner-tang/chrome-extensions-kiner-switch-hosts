@@ -129,10 +129,10 @@ function proxy(hostsList) {
         	const realDomain = item.domain.replace(/\./g, "\\.");
             // TODO 解决https的代理问题
             condition += `
-			if(shExpMatch(host, '*${realDomain}*')){
-				return 'PROXY ${item.ip}:80';
-			}
-		`;
+                if(shExpMatch(url, 'http:\/\/${realDomain}*')){
+                    return 'PROXY ${item.ip}:80';
+                }
+		    `;
         }
     });
     const script = `var FindProxyForURL = function(url, host){
