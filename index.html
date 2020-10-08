@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+        }
+        .wrapper {
+            width: 800px;
+        }
+
+        .header {
+            height: 40px;
+            line-height: 40px;
+            box-sizing: border-box;
+            padding: 0 15px;
+            background: #f2f3f7;
+            color: brown;
+            font-size: 16px;
+            position: relative;
+            border-bottom: 1px solid rgba(165, 42, 42, 0.3);
+        }
+        .title a,.title a:visited,.title a:hover{
+            color: cornflowerblue;
+        }
+
+        .add-btn{
+            width: 50px;
+            height: 20px;
+            text-align: center;
+            background: brown;
+            color: #FFFFFF;
+            border-radius: 5px;
+            position: absolute;
+            line-height: 20px;
+            right: 70px;
+            top: 0;
+            bottom: 0;
+            margin: auto 0;
+            font-size: 12px;
+            user-select: none;
+        }
+        .import-btn{
+            width: 70px;
+            height: 20px;
+            text-align: center;
+            background: dodgerblue;
+            color: #FFFFFF;
+            border-radius: 5px;
+            position: absolute;
+            line-height: 20px;
+            right: 125px;
+            top: 0;
+            bottom: 0;
+            margin: auto 0;
+            font-size: 12px;
+            user-select: none;
+        }
+        .import-btn input{
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            position: absolute;
+        }
+        .filter-box{
+            position: absolute;
+            width: 200px;
+            height: 20px;
+            box-sizing: border-box;
+            padding: 0 5px;
+            border: 1px solid rgba(165, 42, 42, 0.3);
+            right: 200px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .filter-box .filter-input{
+            background: none;
+            border: none;
+            outline: none;
+            appearance: none;
+            color: brown;
+            font-size: 12px;
+            height: 100%;
+            width: 80%;
+            position: absolute;
+            left: 5px;
+            top: 0;
+        }
+        .filter-box .filter-btn{
+            width: 50px;
+            height: 18px;
+            background: brown;
+            color: #ffffff;
+            border-radius: 3px;
+            position: absolute;
+            right: 0;
+            top: 0;
+            line-height: 18px;
+            text-align: center;
+            font-size: 12px;
+            user-select: none;
+        }
+        .switch-btn {
+            width: 40px;
+            height: 20px;
+            overflow: hidden;
+            border-radius: 20px;
+            position: absolute;
+            right: 15px;
+            top: 0;
+            bottom: 0;
+            margin: auto 0;
+            cursor: pointer;
+        }
+
+        .switch-btn .bg{
+            background: rgba(255, 67, 67, 0.1);
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            transition: all 300ms;
+        }
+        .switch-btn .front-btn{
+            width: 15px;
+            height: 15px;
+            background: #ffffff;
+            box-shadow: 0 0 5px #999;
+            position: absolute;
+            left: 5px;
+            top: 0;
+            bottom: 0;
+            margin: auto 0;
+            border-radius: 15px;
+            transition: all 300ms linear;
+            user-select: none;
+        }
+        .switch-btn.active .front-btn{
+            left: 20px;
+            user-select: none;
+        }
+        .switch-btn.active .bg{
+            background: brown;
+        }
+        .body{
+            position: relative;
+            padding-bottom: 40px;
+        }
+        .body .tools-panel{
+            height: 40px;
+            line-height: 40px;
+            background: brown;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #ffffff;
+        }
+        .body .tools-panel .col{
+            text-align: center;
+            color: #FFFFFF;
+            flex: 1;
+            border-right: 1px solid #ffffff;
+            cursor: pointer;
+        }
+        .body .tools-panel .col:hover{
+            background: #792424;
+        }
+        .body .tools-panel .col:last-child{
+            border-right: none;
+        }
+
+        .body .tools-panel .col .checkout-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            box-sizing: border-box;
+            padding: 3px;
+            border: 2px solid #ffffff;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+            margin-right: 5px;
+        }
+        .body .tools-panel .col .checkout-box:before {
+            content: "";
+            display: block;
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 2px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 300ms ease-in-out;
+        }
+        .body .tools-panel .col .checkout-box.checked:before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .list{
+            height: 400px;
+            position: relative;
+            overflow: auto;
+        }
+        .list.no-record:before{
+            content: "快去添加一个Host吧!";
+            width: 100%;
+            display: block;
+            position: absolute;
+            line-height: 400px;
+            text-align: center;
+            color: #CCCCCC;
+            font-size: 48px;
+            margin: 0 auto;
+        }
+        .list-item{
+            height: 40px;
+            line-height: 40px;
+            background: antiquewhite;
+            color: brown;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            padding-right: 120px;
+            border-bottom: 1px solid rgba(165, 42, 42, 0.3);
+            font-weight: bold;
+        }
+        .list-item .switch-btn{
+            right: 70px;
+        }
+        .del-btn{
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: orangered;
+            cursor: pointer;
+            letter-spacing: 5px;
+        }
+        .list-item:last-child{
+            border-bottom: none;
+        }
+        .list-item .cell{
+            border-right: 1px solid rgba(165, 42, 42, 0.3);
+        }
+        .list-item .checkbox{
+            flex: 1;
+            text-align: center;
+        }
+        .list-item .checkout-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            box-sizing: border-box;
+            padding: 3px;
+            border: 2px solid #993333;
+            display: inline-block;
+            vertical-align: middle;
+            position: relative;
+        }
+        .list-item .checkout-box:before {
+            content: "";
+            display: block;
+            width: 10px;
+            height: 10px;
+            background: #993333;
+            border-radius: 2px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 300ms ease-in-out;
+        }
+        .list-item .checkout-box.checked:before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        .list-item .idx{
+            flex: 1;
+            text-align: center;
+        }
+        .list-item .domain{
+            flex: 3;
+            text-align: center;
+        }
+        .list-item .ip{
+            flex: 3;
+            text-align: center;
+        }
+        .list-item .alias{
+            flex: 3;
+            text-align: center;
+        }
+
+        .add-host-panel{
+            box-sizing: border-box;
+            padding: 15px;
+            background: antiquewhite;
+        }
+        .add-host-panel .form-item{
+            margin-bottom: 15px;
+            height: 30px;
+            line-height: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .add-host-panel .form-item label{
+            font-size: 14px;
+            color: brown;
+            font-weight: bold;
+            display: inline-block;
+            vertical-align: middle;
+            width: 60px;
+            box-sizing: border-box;
+            padding-right: 15px;
+            text-align: justify;
+            text-align-last: justify;
+        }
+        .add-host-panel .form-item input{
+            display: inline-block;
+            vertical-align: middle;
+            flex-grow: 1;
+            height: 100%;
+            border: 1px solid brown;
+            border-radius: 5px;
+            outline-color: #e93e3e;
+            box-sizing: border-box;
+            padding-left: 15px;
+        }
+        .add-host-panel .btn-group{
+            margin: 15px auto;
+            width: fit-content;
+        }
+        .add-host-panel .save-btn{
+            width: 200px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            color: #FFFFFF;
+            border-radius: 5px;
+            background: brown;
+            margin-right: 10px;
+            display: inline-block;
+            vertical-align: middle;
+            cursor: pointer;
+            user-select: none;
+        }
+        .add-host-panel .cancel-btn{
+            width: 80px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            color: #FFFFFF;
+            border-radius: 5px;
+            background: #cccccc;
+            display: inline-block;
+            vertical-align: middle;
+            cursor: pointer;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <div class="title">Kiner Switch Host(<a href="hosts.csv" download="hosts.csv">csv模版文件下载</a>)</div>
+        <div class="filter-box">
+            <input class="filter-input" placeholder="输入关键字过滤"/>
+            <div class="filter-btn">过滤</div>
+        </div>
+        <div class="add-btn">添加</div>
+        <div class="import-btn">
+            <input type="file" id="file">
+            导入CSV
+        </div>
+        <div class="switch-btn global-switch">
+            <div class="bg"></div>
+            <div class="front-btn"></div>
+        </div>
+    </div>
+    <div class="body">
+        <div class="add-host-panel" style="display: none">
+            <form class="form" id="form">
+                <div class="form-item">
+                    <label for="name">别名</label>
+                    <input id="name" name="name" type="text" placeholder="请输入别名，仅用于展示和过滤">
+                </div>
+                <div class="form-item">
+                    <label for="domain">域名</label>
+                    <input id="domain" name="domain" type="text" placeholder="请输入域名">
+                </div>
+                <div class="form-item">
+                    <label for="ip">IP地址</label>
+                    <input id="ip" name="ip" type="text" placeholder="请输入ip">
+                </div>
+                <div class="btn-group">
+                    <div class="save-btn">新增</div>
+                    <div class="cancel-btn">取消</div>
+                </div>
+
+            </form>
+        </div>
+        <div class="list" style="display: block">
+
+
+        </div>
+        <div class="tools-panel">
+            <div class="col select-all">
+                <div class="checkout-box"></div>全选/取消全选
+            </div>
+            <div class="col select-reverse">反选</div>
+            <div class="col select-open">选中已开启配置</div>
+            <div class="col del-select">删除选中配置</div>
+            <div class="col open-select">开启选中配置</div>
+            <div class="col close-select">关闭选中配置</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/index.js"></script>

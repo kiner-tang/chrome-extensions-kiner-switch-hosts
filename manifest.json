@@ -1,0 +1,37 @@
+{
+  "manifest_version": 2,
+  "name": "Kiner Switch Hosts",
+  "description": "chrome实时切换host",
+  "version": "1.0",
+  "permissions": [
+    "tabs",
+    "storage",
+    "proxy",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_title": "Kiner Switch Hosts",
+    "default_popup": "index.html"
+  },
+  "background": {
+    "scripts": [
+      "js/bg.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "js/o.js",
+        "js/jquery.js",
+        "js/content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}
