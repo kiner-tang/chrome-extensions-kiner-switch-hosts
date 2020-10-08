@@ -41,6 +41,7 @@
             margin: auto 0;
             font-size: 12px;
             user-select: none;
+            cursor: pointer;
         }
         .import-btn{
             width: 70px;
@@ -65,6 +66,7 @@
             left: 0;
             top: 0;
             position: absolute;
+            cursor: pointer;
         }
         .filter-box{
             position: absolute;
@@ -87,7 +89,7 @@
             color: brown;
             font-size: 12px;
             height: 100%;
-            width: 80%;
+            width: 70%;
             position: absolute;
             left: 5px;
             top: 0;
@@ -105,6 +107,7 @@
             text-align: center;
             font-size: 12px;
             user-select: none;
+            cursor: pointer;
         }
         .switch-btn {
             width: 40px;
@@ -373,7 +376,7 @@
     <div class="header">
         <div class="title">Kiner Switch Host(<a href="hosts.csv" download="hosts.csv">csv模版文件下载</a>)</div>
         <div class="filter-box">
-            <input class="filter-input" placeholder="输入关键字过滤"/>
+            <input type="search" class="filter-input" placeholder="输入关键字过滤"/>
             <div class="filter-btn">过滤</div>
         </div>
         <div class="add-btn">添加</div>
