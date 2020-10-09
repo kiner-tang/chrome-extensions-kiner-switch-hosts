@@ -1,7 +1,7 @@
-别名,域名,ip地址,是否默认打开
-官网正式环境,www.baidu.com,127.0.0.1,true
-官网正式环境,www.baidu.com,127.0.0.2,false
-官网正式环境,www.baidu.com,127.0.0.3,false
-m站正式环境,m.baidu.com,127.0.0.1,true
-m站正式环境,m.baidu.com,127.0.0.2,false
-m站正式环境,m.baidu.com,127.0.0.3,false
+别名,域名,ip地址,是否默认打开,标签
+官网正式环境,www.baidu.com,127.0.0.1,true,正式环境:官网
+官网正式环境,www.baidu.com,127.0.0.2,false,正式环境:官网
+官网正式环境,www.baidu.com,127.0.0.3,false,正式环境:官网
+m站正式环境,m.baidu.com,127.0.0.1,true,正式环境:移动端官网
+m站正式环境,m.baidu.com,127.0.0.2,false,正式环境:移动端官网
+m站正式环境,m.baidu.com,127.0.0.3,false,正式环境:移动端官网

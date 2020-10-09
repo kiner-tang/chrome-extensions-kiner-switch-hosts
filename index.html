@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        *{
+        * {
             padding: 0;
             margin: 0;
         }
+
         .wrapper {
             width: 800px;
             background: antiquewhite;
@@ -22,19 +23,61 @@
             font-size: 16px;
             position: relative;
             border-bottom: 1px solid rgba(165, 42, 42, 0.3);
+            z-index: 999999;
         }
-        .title a,.title a:visited,.title a:hover{
+        .tag-panel{
+            height: 40px;
+            line-height: 40px;
+            box-sizing: border-box;
+            padding: 5px 15px;
+            background: #FFFFFF;
+            overflow-x: auto;
+            overflow-y: hidden;
+            position: relative;
+        }
+        .tag-panel:before{
+            content: "标签:";
+            font-size: 14px;
+            font-weight: bold;
+            color: brown;
+            display: inline-block;
+            vertical-align: middle;
+            margin-top: -12px;
+        }
+        .tag-panel .tag{
+            margin-top: -12px;
+            display: inline-block;
+            vertical-align: middle;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            background: brown;
+            color: #ffffff;
+            line-height: 1;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        .title a, .title a:visited, .title a:hover {
             color: cornflowerblue;
         }
 
-        .add-btn{
+        .right-box{
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .add-btn {
             width: 50px;
             height: 20px;
             text-align: center;
             background: brown;
             color: #FFFFFF;
             border-radius: 5px;
-            position: absolute;
+            display: inline-block;
+            vertical-align: middle;
             line-height: 20px;
             right: 70px;
             top: 0;
@@ -44,23 +87,71 @@
             user-select: none;
             cursor: pointer;
         }
-        .import-btn{
+
+        .more-btn-box {
+            display: inline-block;
+            vertical-align: middle;
+            width: 16px;
+            height: 16px;
+            position: relative;
+            z-index: 99999;
+        }
+
+        .more-btn-box .more-btn{
+            width: 16px;
+            position: absolute;
+            bottom: 0;
+            top: 0;
+            margin: auto 0;
+        }
+        .more-btn-box .more-popup {
+            box-sizing: border-box;
+            border-radius: 5px;
+            min-width: 120px;
+            overflow: hidden;
+            box-shadow: 0 0 5px #333;
+            position: absolute;
+            right: 0;
+            top: 16px;
+            display: none;
+            background: #f2f3f7;
+            z-index: 9999;
+        }
+        .more-btn-box .more-popup .more-item{
+            padding: 5px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #333333;
+            display: block;
+            text-decoration: none;
+        }
+        .more-btn-box .more-popup .more-item:hover {
+            cursor: pointer;
+            background: rgba(174, 48, 48, 0.28);
+            color: brown;
+        }
+        .more-btn-box:hover .more-popup{
+            display: block;
+        }
+
+        .import-btn {
             width: 70px;
             height: 20px;
             text-align: center;
             background: dodgerblue;
             color: #FFFFFF;
             border-radius: 5px;
-            position: absolute;
+            display: inline-block;
+            vertical-align: middle;
             line-height: 20px;
-            right: 125px;
-            top: 0;
-            bottom: 0;
-            margin: auto 0;
             font-size: 12px;
             user-select: none;
+            position: relative;
         }
-        .import-btn input{
+
+        .import-btn input {
             opacity: 0;
             width: 100%;
             height: 100%;
@@ -69,20 +160,21 @@
             position: absolute;
             cursor: pointer;
         }
-        .filter-box{
-            position: absolute;
+
+        .filter-box {
             width: 200px;
             height: 20px;
             box-sizing: border-box;
             padding: 0 5px;
             border: 1px solid rgba(165, 42, 42, 0.3);
-            right: 200px;
-            top: 50%;
-            transform: translateY(-50%);
+            display: inline-block;
+            vertical-align: middle;
             border-radius: 3px;
             overflow: hidden;
+            position: relative;
         }
-        .filter-box .filter-input{
+
+        .filter-box .filter-input {
             background: none;
             border: none;
             outline: none;
@@ -95,7 +187,8 @@
             left: 5px;
             top: 0;
         }
-        .filter-box .filter-btn{
+
+        .filter-box .filter-btn {
             width: 50px;
             height: 18px;
             background: brown;
@@ -110,27 +203,32 @@
             user-select: none;
             cursor: pointer;
         }
+
         .switch-btn {
             width: 40px;
             height: 20px;
             overflow: hidden;
             border-radius: 20px;
-            position: absolute;
-            right: 15px;
-            top: 0;
-            bottom: 0;
-            margin: auto 0;
+            display: inline-block;
+            vertical-align: middle;
             cursor: pointer;
+            position: relative;
         }
 
-        .switch-btn .bg{
-            background: rgba(255, 67, 67, 0.1);
+        .switch-btn .bg {
+            background: #f2f3f7;
             width: 100%;
             height: 100%;
             border-radius: 20px;
             transition: all 300ms;
         }
-        .switch-btn .front-btn{
+
+
+        .header .switch-btn .bg{
+            background: #cccccc;
+        }
+
+        .switch-btn .front-btn {
             width: 15px;
             height: 15px;
             background: #ffffff;
@@ -144,18 +242,22 @@
             transition: all 300ms linear;
             user-select: none;
         }
-        .switch-btn.active .front-btn{
+
+        .switch-btn.active .front-btn {
             left: 20px;
             user-select: none;
         }
-        .switch-btn.active .bg{
+
+        .switch-btn.active .bg {
             background: brown;
         }
-        .body{
+
+        .body {
             position: relative;
             padding-bottom: 40px;
         }
-        .body .tools-panel{
+
+        .body .tools-panel {
             height: 40px;
             line-height: 40px;
             background: brown;
@@ -167,17 +269,20 @@
             justify-content: space-between;
             border-top: 1px solid #ffffff;
         }
-        .body .tools-panel .col{
+
+        .body .tools-panel .col {
             text-align: center;
             color: #FFFFFF;
             flex: 1;
             border-right: 1px solid #ffffff;
             cursor: pointer;
         }
-        .body .tools-panel .col:hover{
+
+        .body .tools-panel .col:hover {
             background: #792424;
         }
-        .body .tools-panel .col:last-child{
+
+        .body .tools-panel .col:last-child {
             border-right: none;
         }
 
@@ -193,6 +298,7 @@
             position: relative;
             margin-right: 5px;
         }
+
         .body .tools-panel .col .checkout-box:before {
             content: "";
             display: block;
@@ -206,15 +312,18 @@
             transform: translate(-50%, -50%) scale(0);
             transition: transform 300ms ease-in-out;
         }
+
         .body .tools-panel .col .checkout-box.checked:before {
             transform: translate(-50%, -50%) scale(1);
         }
-        .list{
+
+        .list {
             height: 400px;
             position: relative;
             overflow: auto;
         }
-        .list.no-record:before{
+
+        .list.no-record:before {
             content: "快去添加一个Host吧!";
             width: 100%;
             display: block;
@@ -224,10 +333,10 @@
             color: #CCCCCC;
             font-size: 48px;
             margin: 0 auto;
+            z-index: 99;
         }
-        .list-item{
-            height: 40px;
-            line-height: 40px;
+
+        .list-item {
             background: antiquewhite;
             color: brown;
             font-size: 12px;
@@ -238,28 +347,65 @@
             border-bottom: 1px solid rgba(165, 42, 42, 0.3);
             font-weight: bold;
         }
-        .list-item .switch-btn{
+
+        .list-item .switch-btn {
+            position: absolute;
+            top: 50%;
             right: 70px;
+            transform: translateY(-50%);
         }
-        .del-btn{
+
+        .del-btn {
             position: absolute;
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: orangered;
+            color: brown;
             cursor: pointer;
             letter-spacing: 5px;
         }
-        .list-item:last-child{
+
+        .list-item:last-child {
             border-bottom: none;
         }
-        .list-item .cell{
+
+        .list-item .cell {
             border-right: 1px solid rgba(165, 42, 42, 0.3);
+            position: relative;
+            padding: 10px 0;
         }
-        .list-item .checkbox{
+        .list-item .cell:before{
+            content: "";
+            display: inline-block;
+            vertical-align: middle;
+            height: 100%;
+        }
+
+        .list-item .checkbox {
             flex: 1;
             text-align: center;
         }
+        .list-item .tags{
+            flex: 2;
+        }
+        .list-item .tags:before{
+            display: none;
+        }
+
+        .list-item .tags .tag{
+            display: block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            background: brown;
+            color: #ffffff;
+            width: fit-content;
+            height: fit-content;
+            line-height: 1.5;
+            transform: scale(.8);
+            margin: 5px auto;
+        }
+
         .list-item .checkout-box {
             width: 20px;
             height: 20px;
@@ -269,8 +415,12 @@
             border: 2px solid #993333;
             display: inline-block;
             vertical-align: middle;
-            position: relative;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
         }
+
         .list-item .checkout-box:before {
             content: "";
             display: block;
@@ -284,39 +434,46 @@
             transform: translate(-50%, -50%) scale(0);
             transition: transform 300ms ease-in-out;
         }
+
         .list-item .checkout-box.checked:before {
             transform: translate(-50%, -50%) scale(1);
         }
-        .list-item .idx{
+
+        .list-item .idx {
             flex: 1;
             text-align: center;
         }
-        .list-item .domain{
-            flex: 3;
-            text-align: center;
-        }
-        .list-item .ip{
-            flex: 3;
-            text-align: center;
-        }
-        .list-item .alias{
+
+        .list-item .domain {
             flex: 3;
             text-align: center;
         }
 
-        .add-host-panel{
+        .list-item .ip {
+            flex: 3;
+            text-align: center;
+        }
+
+        .list-item .alias {
+            flex: 3;
+            text-align: center;
+        }
+
+        .add-host-panel {
             box-sizing: border-box;
             padding: 15px;
             background: antiquewhite;
         }
-        .add-host-panel .form-item{
+
+        .add-host-panel .form-item {
             margin-bottom: 15px;
             height: 30px;
             line-height: 30px;
             display: flex;
             justify-content: space-between;
         }
-        .add-host-panel .form-item label{
+
+        .add-host-panel .form-item label {
             font-size: 14px;
             color: brown;
             font-weight: bold;
@@ -328,7 +485,8 @@
             text-align: justify;
             text-align-last: justify;
         }
-        .add-host-panel .form-item input{
+
+        .add-host-panel .form-item input {
             display: inline-block;
             vertical-align: middle;
             flex-grow: 1;
@@ -339,11 +497,13 @@
             box-sizing: border-box;
             padding-left: 15px;
         }
-        .add-host-panel .btn-group{
+
+        .add-host-panel .btn-group {
             margin: 15px auto;
             width: fit-content;
         }
-        .add-host-panel .save-btn{
+
+        .add-host-panel .save-btn {
             width: 200px;
             height: 40px;
             line-height: 40px;
@@ -357,7 +517,126 @@
             cursor: pointer;
             user-select: none;
         }
-        .add-host-panel .cancel-btn{
+
+        .add-host-panel .cancel-btn {
+            width: 80px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            color: #FFFFFF;
+            border-radius: 5px;
+            background: #cccccc;
+            display: inline-block;
+            vertical-align: middle;
+            cursor: pointer;
+            user-select: none;
+        }
+        .fav-panel{
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999999;
+            display: none;
+        }
+        .fav-panel .mask{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            z-index: 999999;
+            background: rgba(0,0,0,.7);
+            display: none;
+        }
+        .fav-panel .fav-content-box{
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 400px;
+            height: 100%;
+            z-index: 999999;
+            background: antiquewhite;
+            box-shadow: 0 0 5px #333333;
+            transform: translateX(100%);
+            transition: transform 300ms;
+            box-sizing: border-box;
+            overflow: auto;
+            padding: 15px;
+        }
+        .fav-panel .fav-content-box .fav-list-item{
+            padding: 5px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-content: center;
+            align-items: center;
+            text-align: center;
+            background: #ffffff;
+            box-shadow: 0 0 5px #CCCCCC;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        .fav-panel .fav-content-box .fav-list-item.active {
+            background: rgba(165, 42, 42, 0.21);
+        }
+        .fav-panel .fav-content-box .fav-list-item .name{
+            text-align: justify;
+        }
+        .fav-panel .fav-content-box .fav-list-item .cell{
+            font-size: 14px;
+            color: brown;
+            flex: 4;
+        }
+        .fav-panel .fav-content-box .fav-list-item .cell.date{
+            color: #666;
+        }
+        .fav-panel .fav-content-box .fav-list-item .cell.del{
+            cursor: pointer;
+        }
+        .fav-panel .fav-content-box .fav-list-item .cell.idx,.fav-panel .fav-content-box .fav-list-item .cell.del{
+            flex: 1;
+        }
+        .fav-panel .fav-content-box .fav-list-item .cell.idx{
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .config-input{
+            box-sizing: border-box;
+            padding: 15px;
+            background: antiquewhite;
+            display: none;
+        }
+        .config-input .config-area{
+            width: 100%;
+            height: 200px;
+            background: #f2f3f7;
+            box-shadow: 0 0 5px #cccccc;
+            line-height: 2;
+            box-sizing: border-box;
+            padding: 10px;
+            resize: none;
+            border-radius: 5px;
+        }
+        .config-input .btn-group{
+            text-align: center;
+            margin: 15px auto;
+        }
+        .config-input .save-btn {
+            width: 200px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            color: #FFFFFF;
+            border-radius: 5px;
+            background: brown;
+            margin-right: 10px;
+            display: inline-block;
+            vertical-align: middle;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .config-input .cancel-btn {
             width: 80px;
             height: 40px;
             line-height: 40px;
@@ -374,21 +653,36 @@
 </head>
 <body>
 <div class="wrapper">
+
     <div class="header">
         <div class="title">Kiner Switch Host(<a href="hosts.csv" download="hosts.csv">csv模版文件下载</a>)</div>
-        <div class="filter-box">
-            <input type="search" class="filter-input" placeholder="输入关键字过滤"/>
-            <div class="filter-btn">过滤</div>
+        <div class="right-box">
+            <div class="filter-box">
+                <input type="search" class="filter-input" placeholder="输入关键字过滤"/>
+                <div class="filter-btn">过滤</div>
+            </div>
+            <div class="add-btn">添加</div>
+            <div class="import-btn">
+                <input type="file" id="file">
+                导入CSV
+            </div>
+            <div class="switch-btn global-switch">
+                <div class="bg"></div>
+                <div class="front-btn"></div>
+            </div>
+            <div class="more-btn-box">
+                <img src="./more.png" alt="" class="more-btn">
+                <div class="more-popup">
+                    <div class="more-item input-csv">输入CSV配置</div>
+                    <div class="more-item save-fav">设为偏好</div>
+                    <div class="more-item fav-config">偏好列表</div>
+                    <a id="export" class="more-item export">导出当前配置</a>
+                </div>
+            </div>
         </div>
-        <div class="add-btn">添加</div>
-        <div class="import-btn">
-            <input type="file" id="file">
-            导入CSV
-        </div>
-        <div class="switch-btn global-switch">
-            <div class="bg"></div>
-            <div class="front-btn"></div>
-        </div>
+    </div>
+    <div class="tag-panel">
+
     </div>
     <div class="body">
         <div class="add-host-panel" style="display: none">
@@ -405,6 +699,10 @@
                     <label for="ip">IP地址</label>
                     <input id="ip" name="ip" type="text" placeholder="请输入ip">
                 </div>
+                <div class="form-item">
+                    <label for="tags">标签</label>
+                    <input id="tags" name="tags" type="text" placeholder="请输入配置标签，多个标签以:分隔">
+                </div>
                 <div class="btn-group">
                     <div class="save-btn">新增</div>
                     <div class="cancel-btn">取消</div>
@@ -413,12 +711,19 @@
             </form>
         </div>
         <div class="list" style="display: block">
+        </div>
+        <div class="config-input">
+            <textarea class="config-area" placeholder="在此按照CSV格式输入host配置" id="" cols="30" rows="10"></textarea>
 
-
+            <div class="btn-group">
+                <div class="save-btn">新增</div>
+                <div class="cancel-btn">取消</div>
+            </div>
         </div>
         <div class="tools-panel">
             <div class="col select-all">
-                <div class="checkout-box"></div>全选/取消全选
+                <div class="checkout-box"></div>
+                全选/取消全选
             </div>
             <div class="col select-reverse">反选</div>
             <div class="col select-open">选中已开启配置</div>
@@ -426,6 +731,10 @@
             <div class="col open-select">开启选中配置</div>
             <div class="col close-select">关闭选中配置</div>
         </div>
+    </div>
+    <div class="fav-panel">
+        <div class="mask"></div>
+        <div class="fav-content-box"></div>
     </div>
 </div>
 </body>

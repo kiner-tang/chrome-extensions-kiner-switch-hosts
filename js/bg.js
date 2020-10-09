@@ -41,6 +41,18 @@ function saveGlobalSwitch(val) {
     });
 }
 
+function storageSet(key, val, cb){
+    chrome.storage.local.set({[key]: val}, cb);
+}
+
+function storageGet(key, defaultVal, cb){
+    let realKey = Array.isArray(key)?key:[key];
+    chrome.storage.local.get(realKey, function (result) {
+        console.log(result[realKey[0]]);
+        cb && cb(result[realKey[0]]?result[realKey[0]]:defaultVal);
+    });
+}
+
 
 function getGlobalSwitch(cb) {
     chrome.storage.local.get([KinerSwitchHostGlobalConfig], function (result) {
