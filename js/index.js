@@ -37,11 +37,13 @@ $('.save-btn').click(function () {
 $('.cancel-btn').click(function () {
     $('.add-host-panel').hide();
     $('.list').show();
+    $('.tools-panel').show();
 });
 
 $('.add-btn').click(function () {
     $('.list').hide();
     $('.add-host-panel').show();
+    $('.tools-panel').hide();
 });
 
 $('body').on('click', '.list-item .del-btn', function () {
