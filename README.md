@@ -1,6 +1,19 @@
 # chrome-extensions-kiner-switch-hosts
 chrome快速切换host的扩展程序
 
+## 已实现功能
+
+- [x] 实时切换host
+- [x] 对多个host配置进行统一管理
+- [x] 支持导入csv数据
+- [x] 支持批量开启和关闭
+- [x] 支持批量删除
+- [x] 实现switch host的偏好设置保存及切换功能
+- [x] 实现switch host导出当前配置功能
+- [x] 实现Csv格式文本直接录入功能
+- [x] 根据域名实现分组变色功能
+- [x] 增加配置标签即根据标签快速检索功能
+
 ## 使用方式
 
 1. 将当前项目检出至本地
