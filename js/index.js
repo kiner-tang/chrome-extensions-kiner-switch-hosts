@@ -51,6 +51,8 @@ $('.add-host-panel .save-btn').click(function () {
 
     $('.add-host-panel').hide();
     $('.list').show();
+    $('.tools-panel').show();
+    $('.tag-panel').show();
 });
 
 $('.add-host-panel .cancel-btn').click(function () {
@@ -61,6 +63,7 @@ $('.add-host-panel .cancel-btn').click(function () {
 
 $('.header .add-btn').click(function () {
     $('.list').hide();
+    $('.tag-panel').hide();
     $('.add-host-panel').show();
     $('.tools-panel').hide();
 });
@@ -100,7 +103,14 @@ function hideFavPanel() {
 $('body').on('click', '.list-item .del-btn', function () {
     const uid = $(this).parents('.list-item').data('uid');
     const idx = localConfig.findIndex(item => item.id === uid);
-    del(idx);
+    del(idx+1);
+    const conf = favList.find(item=>item.favId===currentFavId);
+    conf.config.splice(idx,1);
+    updateConfigInFavList(currentFavId, conf,function () {
+        updateTag();
+        renderTags();
+        renderList();
+    });
 }).on('click', '.list-item .can-edit', function () {
     $(this).attr('contenteditable', true);
 }).on('blur', '.list-item .can-edit', function () {
@@ -244,6 +254,14 @@ $('.fav-panel').on('click', '.fav-list-item', function () {
         renderList();
         hideFavPanel();
     });
+});
+
+$('.fav-panel .del-all').click(function () {
+    const bg = chrome.extension.getBackgroundPage();
+    bg.storageSet(favListKey, []);
+    bg.storageSet(currentFavIdKey, "");
+    renderFavList([]);
+    renderList();
 });
 
 function showInputCsv() {
@@ -526,6 +544,7 @@ function renderList(cb) {
             }
             bg.getConfig(res => {
                 localConfig = (res || {})[stroageKey] || [];
+                localConfig = localConfig.filter(item=>!!item);
                 bg.updateConfig();
                 // 监听消息
                 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -536,6 +555,11 @@ function renderList(cb) {
                     });
                 });
                 render(localConfig);
+                localConfig.forEach(config=>{
+                    config.tags.split(":").forEach(item=>!tags.has(item)&&tags.add(item));
+                });
+                console.log(localConfig, tags);
+                updateTag();
                 cb&&cb();
             });
         });
@@ -603,9 +627,9 @@ function renderTags(){
  */
 function update(config, isReplace = false) {
     const bg = chrome.extension.getBackgroundPage();
-    bg.saveConfig(config, isReplace);
-
-    renderList();
+    bg.saveConfig(config, isReplace,function () {
+        renderList();
+    });
 }
 
 /**
@@ -635,6 +659,17 @@ function createUid() {
     return `${parseInt((Math.random() * 9999999999999) + "")}_${Date.now()}`
 }
 
+function updateConfigInFavList(favId, config, cb){
+    const bg = chrome.extension.getBackgroundPage();
+    const conf = favList.find(item=>item.favId===favId);
+    const confIndex = favList.findIndex(item=>item.favId===favId);
+    conf.config.push(config);
+    favList.splice(confIndex, 1, conf);
+    bg.storageSet(favListKey, favList, function () {
+        cb && cb();
+    });
+}
+
 /**
  * 新增host
  */
@@ -648,16 +683,17 @@ function addHost() {
         const form = $('#form').serializeArray();
         const config = parseObj(form);
         config.id = createUid();
-
         config.tags.split(':').forEach(tag=>!tags.has(tag)&&tags.add(tag));
 
-        updateTag();
-
-
         if (doValidate(config)) {
-
-            update(config);
-
+            localConfig.push(config);
+            updateConfigInFavList(currentFavId, config,function () {
+                updateTag();
+                renderTags();
+                update(config);
+                renderList();
+                console.log(localConfig, tags);
+            });
         }
     });
 

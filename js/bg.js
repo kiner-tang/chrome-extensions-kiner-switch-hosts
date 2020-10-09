@@ -12,7 +12,7 @@ function getConfig(cb) {
     });
 }
 
-function saveConfig(config, replace = false) {
+function saveConfig(config, replace = false, cb) {
     const newArr = replace ? config : [...(Array.isArray(oldConfig) ? oldConfig : []), ...(Array.isArray(config) ? config : [])];
 	oldConfig = newArr;
 	info = {
@@ -23,6 +23,7 @@ function saveConfig(config, replace = false) {
     chrome.storage.local.set({[stroageKey]: newArr}, function () {
         // Notify that we saved.
         // message('保存成功');
+        cb && cb();
     });
 }
 

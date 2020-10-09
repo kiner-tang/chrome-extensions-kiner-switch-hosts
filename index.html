@@ -34,6 +34,7 @@
             overflow-x: auto;
             overflow-y: hidden;
             position: relative;
+            white-space: nowrap;
         }
         .tag-panel:before{
             content: "标签:";
@@ -567,6 +568,15 @@
             overflow: auto;
             padding: 15px;
         }
+        .fav-panel .del-all{
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            padding: 15px;
+            color: brown;
+            z-index: 99999999999;
+            cursor: pointer;
+        }
         .fav-panel .fav-content-box .fav-list-item{
             padding: 5px 15px;
             display: flex;
@@ -741,6 +751,7 @@
     <div class="fav-panel">
         <div class="mask"></div>
         <div class="fav-content-box"></div>
+        <div class="del-all">删除所有偏好</div>
     </div>
 </div>
 </body>
