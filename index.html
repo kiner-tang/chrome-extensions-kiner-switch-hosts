@@ -151,7 +151,11 @@
             position: relative;
         }
 
-        .import-btn input {
+        .import-fav{
+            position: relative;
+        }
+
+        .import-btn input, .import-fav input {
             opacity: 0;
             width: 100%;
             height: 100%;
@@ -673,10 +677,12 @@
             <div class="more-btn-box">
                 <img src="./more.png" alt="" class="more-btn">
                 <div class="more-popup">
-                    <div class="more-item input-csv">输入CSV配置</div>
                     <div class="more-item save-fav">设为偏好</div>
+                    <div class="more-item input-csv">输入CSV配置</div>
+                    <div class="more-item import-fav"><input type="file" id="favJson">导入偏好列表json</div>
                     <div class="more-item fav-config">偏好列表</div>
                     <a id="export" class="more-item export">导出当前配置</a>
+                    <a id="exportFav" class="more-item export-fav">导出当偏好列表</a>
                 </div>
             </div>
         </div>

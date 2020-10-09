@@ -156,6 +156,7 @@ $('#file').change(function (e) {
 
 $('.more-btn-box').mouseover(function () {
     preExport();
+    preExportFav();
 });
 
 $('.filter-btn').click(function () {
@@ -274,6 +275,40 @@ $('.config-input').on('click', '.save-btn', function () {
     hideInputCsv();
 });
 
+$('#favJson').change(function (e) {
+    const files = e.target.files;
+    importFavJsonFile(files[0], function () {
+        $(this).val('');
+    })
+});
+
+function importFavJsonFile(file, cb){
+    const reader = new FileReader();
+    reader.onload = function () {
+        const res = reader.result;
+        if (res) {
+            importFavJson(res, cb);
+        }
+    };
+    reader.readAsText(file);
+}
+
+function importFavJson(res, cb){
+    const bg = chrome.extension.getBackgroundPage();
+    let json = {};
+    try{
+        json = JSON.parse(res);
+    }catch (e) {
+        json = {};
+    }
+
+    favList = json;
+    bg.storageSet(favListKey, json, function () {
+        initFavList();
+    });
+    // console.log(json);
+}
+
 
 function preExport() {
     if (!localConfig) {
@@ -281,11 +316,27 @@ function preExport() {
     }
     let txt = "别名,域名,ip地址,是否默认打开,标签\n";
     const curFav = favList.find(item => item.favId === currentFavId);
-    txt += localConfig.map(item => `${item.name},${item.domain},${item.ip},${item.isOpen},${item.tags.join(':')}`).join('\n');
+    txt += localConfig.map(item => `${item.name},${item.domain},${item.ip},${item.isOpen},${item.tags}`).join('\n');
     // console.log(txt);
     initCsvLink(txt, `${curFav.name}.csv`);
 }
 
+function preExportFav() {
+    if (!favList) {
+        return;
+    }
+    // console.log(txt);
+    initJSONLink(JSON.stringify(favList, null, 4), `KinerSwitchHost偏好列表.json`);
+}
+
+function initJSONLink(data, fileName) {
+    data = "\ufeff" + data;
+    const blob = new Blob([data], {type: 'text/json,charset=UTF-8'});
+    const csvUrl = URL.createObjectURL(blob);
+    const link = $("#exportFav");
+    link.attr("href", csvUrl);
+    link.attr("download", fileName);
+}
 function initCsvLink(data, fileName) {
     data = "\ufeff" + data;
     const blob = new Blob([data], {type: 'text/csv,charset=UTF-8'});
@@ -635,6 +686,7 @@ function renderFavList(list) {
     });
     listPanel.html(html);
     console.log(list);
+    favList = list;
 }
 
 $('.fav-panel').on('click', '.fav-list-item .del', function (e) {
