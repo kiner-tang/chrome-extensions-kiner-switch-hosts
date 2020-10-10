@@ -17,7 +17,7 @@
   },
   "background": {
     "scripts": [
-      "js/bg.js"
+      "js/background_script.js"
     ]
   },
   "content_scripts": [
