@@ -238,6 +238,11 @@ function initEvent() {
         $(this).find('.checkout-box').toggleClass('checked');
     });
 
+    $actionSelectOpen.off('click').on('click',function () {
+        $configList.find('.list-item .checkout-box').removeClass('checked');
+        $configList.find('.list-item .switch-btn.active').parents('.list-item').find('.checkout-box').addClass('checked');
+    });
+
     $actionReverse.off('click').on('click',function () {
         $configList.find('.list-item .checkout-box').each(function (index, item) {
             if($(item).hasClass('checked')){
