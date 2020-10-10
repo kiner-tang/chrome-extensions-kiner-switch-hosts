@@ -17,7 +17,7 @@
             height: 40px;
             line-height: 40px;
             box-sizing: border-box;
-            padding: 0 15px;
+            padding: 0 5px;
             background: #f2f3f7;
             color: brown;
             font-size: 16px;
@@ -57,6 +57,18 @@
             line-height: 1;
             margin-left: 10px;
             cursor: pointer;
+        }
+        .title {
+            font-size: 14px;
+        }
+        .title .fav-name{
+            max-width: 200px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            word-break: keep-all;
+            display: inline-block;
+            vertical-align: bottom;
+            overflow: hidden;
         }
 
         .title a, .title a:visited, .title a:hover {
@@ -152,11 +164,11 @@
             position: relative;
         }
 
-        .import-fav{
+        .import-fav, .import-csv{
             position: relative;
         }
 
-        .import-btn input, .import-fav input {
+        .import-btn input, .import-fav input,.import-csv input {
             opacity: 0;
             width: 100%;
             height: 100%;
@@ -390,6 +402,7 @@
         .list-item .checkbox {
             flex: 1;
             text-align: center;
+            cursor: pointer;
         }
         .list-item .tags{
             flex: 2;
@@ -670,17 +683,13 @@
 <div class="wrapper">
 
     <div class="header">
-        <div class="title">Kiner Switch Host(<a href="hosts.csv" download="hosts.csv">csv模版文件下载</a>)</div>
+        <div class="title">Kiner Switch Host【<span class="fav-name"></span>】(<a href="hosts.csv" download="hosts.csv">csv模版文件下载</a>)</div>
         <div class="right-box">
             <div class="filter-box">
                 <input type="search" class="filter-input" placeholder="输入关键字过滤"/>
                 <div class="filter-btn">筛选</div>
             </div>
             <div class="add-btn">添加</div>
-            <div class="import-btn">
-                <input type="file" id="file">
-                导入CSV
-            </div>
             <div class="switch-btn global-switch">
                 <div class="bg"></div>
                 <div class="front-btn"></div>
@@ -690,6 +699,7 @@
                 <div class="more-popup">
                     <div class="more-item save-fav">设为偏好</div>
                     <div class="more-item input-csv">输入CSV配置</div>
+                    <div class="more-item import-csv"><input type="file" id="configCsv">导入CSV配置</div>
                     <div class="more-item import-fav"><input type="file" id="favJson">导入偏好列表json</div>
                     <div class="more-item fav-config">偏好列表</div>
                     <a id="export" class="more-item export">导出当前配置</a>
@@ -730,7 +740,7 @@
         <div class="list" style="display: block">
         </div>
         <div class="config-input">
-            <textarea class="config-area" placeholder="在此按照CSV格式输入host配置" id="" cols="30" rows="10"></textarea>
+            <textarea class="config-area" placeholder="在此按照CSV格式输入host配置" id="csvInput" cols="30" rows="10"></textarea>
 
             <div class="btn-group">
                 <div class="save-btn">新增</div>
