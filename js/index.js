@@ -21,6 +21,8 @@ let colors = [
 let colorIdx = 0;
 let domainColor = {};
 
+const csvHeader = "别名,域名,ip地址,是否默认打开,标签\n";
+
 
 const tpl = `<div class="list-item" data-idx="{{idx}}" data-uid="{{uid}}" style="background-color: {{bgColor}};">
                 <div class="cell checkbox">
@@ -217,10 +219,23 @@ $('.select-open').click(function () {
 $('.del-select').click(function () {
     const selectItem = getSelectItem();
     const bg = chrome.extension.getBackgroundPage();
-    const idxs = selectItem.map(item => item.idx);
+    const idxs = selectItem.sort((a,b)=>b.idx-a.idx).map(item => {
+        localConfig.splice(item.idx, 1);
+        return item.idx
+    });
+    const conf = favList.find(item=>item.favId===currentFavId);
+    const confIndex = favList.findIndex(item=>item.favId===currentFavId);
+    conf.config = localConfig;
     bg.removeIdxs(idxs);
-    renderList();
-    resetToolsPanel();
+    favList.splice(confIndex, 1, conf);
+    bg.storageSet(favListKey, favList, function () {
+        updateTag();
+        renderTags();
+        renderList();
+        update(localConfig, true);
+        updateTag();
+        resetToolsPanel();
+    });
 });
 $('.open-select').click(function () {
     const selectItem = getSelectItem();
@@ -332,8 +347,12 @@ function preExport() {
     if (!localConfig) {
         return;
     }
-    let txt = "别名,域名,ip地址,是否默认打开,标签\n";
+    let txt = csvHeader;
     const curFav = favList.find(item => item.favId === currentFavId);
+
+    if(!curFav){
+        return;
+    }
     txt += localConfig.map(item => `${item.name},${item.domain},${item.ip},${item.isOpen},${item.tags}`).join('\n');
     // console.log(txt);
     initCsvLink(txt, `${curFav.name}.csv`);
@@ -449,7 +468,7 @@ function getSelectItem() {
  */
 function importCsv(res, cb) {
     //显示文件内容
-    const arr = res.split("\n").slice(1);
+    const arr = res.split("\n").filter(item=>item!==csvHeader);
     const result = arr.map(item => {
         const vals = item.split(',');
         vals[4].split(":").forEach(item=>!tags.has(item)&&tags.add(item));
@@ -462,9 +481,14 @@ function importCsv(res, cb) {
             tags: vals[4]
         };
     });
-    console.log(result);
-    update(result);
-    updateTag();
+    updateConfigInFavList(currentFavId, result,function () {
+        updateTag();
+        renderTags();
+        renderList();
+        update(result);
+        updateTag();
+    });
+
     cb && cb();
 }
 
@@ -663,7 +687,12 @@ function updateConfigInFavList(favId, config, cb){
     const bg = chrome.extension.getBackgroundPage();
     const conf = favList.find(item=>item.favId===favId);
     const confIndex = favList.findIndex(item=>item.favId===favId);
-    conf.config.push(config);
+    if(Array.isArray(config)){
+        conf.config.push(...config);
+    }else{
+        conf.config.push(config);
+    }
+
     favList.splice(confIndex, 1, conf);
     bg.storageSet(favListKey, favList, function () {
         cb && cb();
