@@ -1,4 +1,4 @@
-const namespace = "KinerSwitchHosts";
+let namespace = "KinerSwitchHosts";
 
 let localConfig = [];
 let isOpen = false;
@@ -31,16 +31,27 @@ function log(messages) {
 
 // const stroageKey = "KinerSwitchHostConfig";
 // const KinerSwitchHostGlobalConfig = "KinerSwitchHostGlobalConfig";
+function doSendMessage(){
+    chrome.runtime.sendMessage(
+        {greeting: "load"},
+        function(response) {
+            if(response){
+                const favList = response.list;
+                const currentFavId = response.currentFavId;
+                localConfig = favList.find(item=>item.favId===currentFavId);
+                if(!localConfig){
+                    return;
+                }
+                namespace = `${namespace}[${localConfig.name}]`;
+                localConfig = localConfig.config;
+                isOpen = response.isOpen;
+                // console.log(isOpen);
+                if(isOpen){
+                    showLog();
+                }
+            }
 
-chrome.runtime.sendMessage(
-    {greeting: "load"},
-    function(response) {
-        localConfig = response.list;
-        isOpen = response.isOpen;
-        // console.log(isOpen);
-        if(isOpen){
-            showLog();
         }
-
-    }
-);
+    );
+}
+doSendMessage();

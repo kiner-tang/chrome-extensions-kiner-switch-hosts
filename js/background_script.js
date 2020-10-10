@@ -1,5 +1,6 @@
-const stroageKey = "KinerSwitchHostConfig";
+const stroageKey = "fav-list";
 const KinerSwitchHostGlobalConfig = "KinerSwitchHostGlobalConfig";
+const currentFavIdKey = "currentFavIdKey";
 let oldConfig = [];
 let info = {};
 let isOpen = false;
@@ -12,6 +13,12 @@ let isOpen = false;
  */
 function storageSet(key, val, cb){
     chrome.storage.local.set({[key]: val}, cb);
+    if(key===stroageKey){
+        info.list = val;
+    }
+    if(key===KinerSwitchHostGlobalConfig){
+        info.isOpen = val;
+    }
 }
 
 /**
@@ -24,6 +31,12 @@ function storageGet(key, defaultVal, cb){
     const realKey = Array.isArray(key)?key:[key];
     chrome.storage.local.get(realKey, function (result) {
         cb && cb(result);
+        if(key.includes(stroageKey)){
+            info.list = result[stroageKey];
+        }
+        if(key.includes(KinerSwitchHostGlobalConfig)){
+            info.isOpen = result[stroageKey];
+        }
     });
 }
 
@@ -49,6 +62,8 @@ function storageGetSimple(key, defaultVal, cb){
  */
 function proxy(hostsList) {
     let condition = ``;
+
+
     hostsList.forEach(item => {
         if (item.isOpen&&item.domain) {
             const realDomain = item.domain.replace(/\./g, "\\.");
@@ -77,21 +92,31 @@ function proxy(hostsList) {
 }
 
 /**
- * 初始化获取本地数据
+ * 取消代理
  */
-storageGet([KinerSwitchHostGlobalConfig, stroageKey], function (result) {
-    info = {
-        list: result[stroageKey],
-        isOpen: result[KinerSwitchHostGlobalConfig]
-    };
-});
-
-startListener();
-function startListener(){
-    // 监听消息
-    chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-
-        sendResponse(info);
-
+function cancelProxy(){
+    chrome.proxy.settings.set({'value': {'mode': 'direct'}}, function (e) {
+        console.log(e)
     });
 }
+
+
+/**
+ * 初始化获取本地数据
+ */
+storageGet([KinerSwitchHostGlobalConfig, stroageKey, currentFavIdKey], {},function (result) {
+    info = {
+        list: result[stroageKey],
+        isOpen: result[KinerSwitchHostGlobalConfig],
+        currentFavId: result[currentFavIdKey]
+    };
+    console.log('--->', result)
+});
+
+// 监听消息
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+
+    console.log(info);
+    sendResponse(info);
+
+});

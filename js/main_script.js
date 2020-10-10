@@ -465,7 +465,7 @@ function createDefaultFav() {
  * 初始化数据
  */
 function initData(cb) {
-    bg.storageGet([stroageKey, favListKey, currentFavIdKey, KinerSwitchHostGlobalConfig], [], function (res) {
+    bg.storageGet([favListKey, currentFavIdKey, KinerSwitchHostGlobalConfig], [], function (res) {
         favList = res[favListKey]||[];
         if(favList.length===0){
             createDefaultFav();
@@ -534,6 +534,7 @@ function renderFavList() {
 function renderConfList(val) {
     let html = '';
     let currentConfigList = getCurrentConfig();
+    doProxy(currentConfigList);
     const currentFav = favList.find(item=>item.favId===currentFavId);
     if(currentFav){
         $favName.text(`${currentFav.name}`);
@@ -879,6 +880,19 @@ function initDownloadLink(target, fileName, type, data){
     const link = target;
     link.attr("href", url);
     link.attr("download", fileName);
+}
+
+/**
+ * 启动代理
+ * @param hostList
+ */
+function doProxy(hostList){
+    if(globalSwitch){
+        bg.proxy(hostList);
+    }else{
+        bg.cancelProxy();
+    }
+
 }
 
 init();
