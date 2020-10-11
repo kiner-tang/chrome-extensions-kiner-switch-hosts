@@ -640,6 +640,18 @@
             background: antiquewhite;
             display: none;
         }
+        .config-input .tips{
+            font-size: 14px;
+            color: darkred;
+        }
+        .config-input .example{
+            background: #f2f3f7;
+            padding: 15px;
+            border-radius: 5px;
+            line-height: 1.5;
+            margin: 15px 0;
+            color: brown;
+        }
         .config-input .config-area{
             width: 100%;
             height: 200px;
@@ -746,6 +758,16 @@
         <div class="list" style="display: block">
         </div>
         <div class="config-input">
+            <p class="tips">在下面输入框中输入CSV格式文本，格式如下</p>
+            <div class="example">
+                <p>别名,域名,ip地址,是否默认打开,标签</p>
+                <p>官网正式环境,www.baidu.com,127.0.0.1,true,正式环境:官网</p>
+                <p>官网正式环境,www.baidu.com,127.0.0.2,false,正式环境:官网</p>
+                <p>官网正式环境,www.baidu.com,127.0.0.3,false,正式环境:官网</p>
+                <p>m站正式环境,m.baidu.com,127.0.0.1,true,正式环境:移动端官网</p>
+                <p>m站正式环境,m.baidu.com,127.0.0.2,false,正式环境:移动端官网</p>
+                <p>m站正式环境,m.baidu.com,127.0.0.3,false,正式环境:移动端官网</p>
+            </div>
             <textarea class="config-area" placeholder="在此按照CSV格式输入host配置" id="csvInput" cols="30" rows="10"></textarea>
 
             <div class="btn-group">

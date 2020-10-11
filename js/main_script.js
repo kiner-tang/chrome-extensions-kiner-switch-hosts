@@ -774,7 +774,7 @@ function doValidate(config) {
 function importCsv(csv){
     csv = csv.trim();
     //显示文件内容
-    const arr = csv.split("\n").filter(item=>!item.includes(csvHeader.replace(/\n/g,'')));
+    const arr = csv.split("\n").filter(item=>!item.includes(csvHeader.replace(/\n/g,''))).filter(item=>item.trim().length!==0);
     const result = arr.map(item => {
         const vals = item.split(',');
         vals[4].split(":").forEach(item=>!tags.has(item)&&tags.add(item));
