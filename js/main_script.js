@@ -97,6 +97,8 @@ const $showShortKeyModal = $('.show-key-modal');
 const $menuBtn = $('.more-btn-box');
 const $favName = $('.fav-name');
 
+const $form = $('.form');
+
 /**
  * 程序入口
  */
@@ -309,12 +311,12 @@ function initEvent() {
             const shortKey = parseShortKey(e);
             currentKeyEvent = shortKey;
             $(this).val(getShortKeyString(shortKey));
-        }else{
+        } else {
             currentKeyEvent = null;
         }
         e.stopPropagation();
     }).on('click', '.save-btn', function () {
-        if(currentKeyEvent){
+        if (currentKeyEvent) {
             const currentFavConfig = favList.find(item => item.favId === curActionFavId);
             const currentFavConfigIdx = favList.findIndex(item => item.favId === curActionFavId);
             currentFavConfig.shortKey = currentKeyEvent;
@@ -324,7 +326,7 @@ function initEvent() {
 
             hideShortKeyModal();
             init();
-        }else{
+        } else {
             alert('请先输入快捷键');
         }
 
@@ -334,7 +336,7 @@ function initEvent() {
 
         console.log(e);
 
-        if (/[0-9a-z]/.test(e.key) && e.ctrlKey) {
+        if (/[0-9a-z]/.test(e.key) && e.ctrlKey && e.target.nodeName !== "INPUT" && e.target.nodeName !== "TEXTAREA") {
             const shortKey = parseShortKey(e);
             console.log(shortKey);
 
@@ -342,15 +344,15 @@ function initEvent() {
 
             const target = favList.filter(item => !!item).find(item => getShortKeyString(item.shortKey) === curKey);
 
-            if(target){
+            if (target) {
 
                 updateCurrentFavId(target.favId);
                 init();
             }
+            e.preventDefault();
+            e.stopPropagation();
         }
 
-        e.preventDefault();
-        e.stopPropagation();
 
     });
 
