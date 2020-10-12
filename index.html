@@ -592,6 +592,15 @@
             z-index: 99999999999;
             cursor: pointer;
         }
+        .fav-panel .short-key{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            padding: 15px;
+            color: #333333;
+            z-index: 99999999999;
+            cursor: pointer;
+        }
         .fav-panel .fav-content-box .fav-list-item{
             padding: 5px 15px;
             display: flex;
@@ -611,6 +620,14 @@
         }
         .fav-panel .fav-content-box .fav-list-item .name{
             text-align: justify;
+        }
+        .fav-panel .fav-content-box .fav-list-item .name .desc{
+            font-size: 12px;
+            color: #cccccc;
+            text-align: left;
+        }
+        .fav-panel .fav-content-box .fav-list-item.active .name .desc{
+            color: #348ec2;
         }
         .fav-panel .fav-content-box .fav-list-item .cell{
             font-size: 14px;
@@ -683,6 +700,91 @@
         }
 
         .config-input .cancel-btn {
+            width: 80px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            color: #FFFFFF;
+            border-radius: 5px;
+            background: #cccccc;
+            display: inline-block;
+            vertical-align: middle;
+            cursor: pointer;
+            user-select: none;
+        }
+        .show-key-modal{
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999999999999;
+            transform: translate3d(0,0,0);
+            display: none;
+        }
+        .show-key-modal .mask{
+            position: absolute;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999999999999;
+            background: rgba(0,0,0,.7);
+        }
+        .show-key-modal .content-box{
+            width: 50%;
+            height: 200px;
+            box-sizing: border-box;
+            padding: 15px;
+            border-radius: 5px;
+            background: #FFFFFF;
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            z-index: 999999999999;
+        }
+        .show-key-modal .content-box .tips{
+            font-size: 14px;
+            color: #999999;
+            padding: 5px 0;
+            text-align: justify;
+        }
+        .show-key-modal .content-box .short-key-input{
+            width: 100%;
+            height: 40px;
+            border: 2px solid #3399CC;
+            border-radius: 5px;
+            color: #3399CC;
+            font-weight: bold;
+            font-size: 14px;
+            box-sizing: border-box;
+            padding: 0 15px;
+        }
+
+        .show-key-modal .content-box .btn-group {
+            margin: 15px auto;
+            width: fit-content;
+        }
+
+        .show-key-modal .content-box .save-btn {
+            width: 200px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            color: #FFFFFF;
+            border-radius: 5px;
+            background: #3399CC;
+            margin-right: 10px;
+            display: inline-block;
+            vertical-align: middle;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .show-key-modal .content-box .cancel-btn {
             width: 80px;
             height: 40px;
             line-height: 40px;
@@ -791,6 +893,17 @@
         <div class="mask"></div>
         <div class="fav-content-box"></div>
         <div class="del-all">删除所有偏好</div>
+    </div>
+    <div class="show-key-modal">
+        <div class="mask"></div>
+        <div class="content-box">
+            <div class="tips">请输入当前偏好的快捷键(支持功能键：ctrl + 数字/字母)</div>
+            <input autofocus="autofocus" type="text" class="short-key-input" placeholder="在此输入当前偏好的快捷键" readonly/>
+            <div class="btn-group">
+                <div class="save-btn">保存</div>
+                <div class="cancel-btn">取消</div>
+            </div>
+        </div>
     </div>
 </div>
 </body>

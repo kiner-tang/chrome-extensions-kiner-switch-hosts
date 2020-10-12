@@ -9,6 +9,8 @@ let colorIdx = 0;
 let domainColor = {};
 let globalSwitch = false;
 let isSelectAll = false;
+let curActionFavId = "";
+let currentKeyEvent = null;
 
 let colors = [
     'rgba(0,102,153,1)',
@@ -44,7 +46,10 @@ const listTpl = `<div class="list-item" data-id="{{id}}" style="background-color
 const favListTpl = `
     <div class="fav-list-item {{isCurrent}}" data-id="{{favId}}">
         <div class="cell idx">{{idx}}</div>
-        <div class="cell name">{{name}}</div>
+        <div class="cell name">
+            <p>{{name}}</p>
+            <p class="desc">{{shortKey}}</p>
+        </div>
         <div class="cell date">{{date}}</div>
         <div class="cell del" data-id="{{favId}}">删除</div>
     </div>
@@ -87,6 +92,8 @@ const $actionCloseSelected = $('.close-select');
 
 const $delAllFav = $('.del-all');
 
+const $showShortKeyModal = $('.show-key-modal');
+
 const $menuBtn = $('.more-btn-box');
 const $favName = $('.fav-name');
 
@@ -121,7 +128,7 @@ function initEvent() {
             $menuImportCsv.val('');
         })
     });
-    $menuSaveFav.off('click').on('click',function () {
+    $menuSaveFav.off('click').on('click', function () {
         const currentConfig = getCurrentConfig();
         saveCurrentConfigAsFav(currentConfig);
     });
@@ -135,6 +142,15 @@ function initEvent() {
         let favId = $(this).data('id');
         updateCurrentFavId(favId);
         hideFavPanel();
+    }).on('contextmenu', '.fav-list-item', function (e) {
+
+        const id = $(this).data('id');
+        const curFavConfig = favList.find(item => item.favId === id);
+        $showShortKeyModal.find('.short-key-input').val(getShortKeyString(curFavConfig.shortKey));
+        showShortKeyModal(id);
+
+        e.preventDefault();
+        return false;
     });
     $tagsPanel.off('click').on('click', '.tag', function () {
         const text = $(this).text();
@@ -178,21 +194,21 @@ function initEvent() {
     }).on('click', '.list-item .switch-btn', function () {
         const configId = $(this).data('id');
         let currentConfigList = getCurrentConfig();
-        const currentConfig = currentConfigList.find(item=>item.id===configId);
-        currentConfigList = currentConfigList.map(item=>{
-            if(item.domain===currentConfig.domain){
-                if(item.id!==configId){
+        const currentConfig = currentConfigList.find(item => item.id === configId);
+        currentConfigList = currentConfigList.map(item => {
+            if (item.domain === currentConfig.domain) {
+                if (item.id !== configId) {
                     return {
                         ...item,
                         isOpen: false
                     }
-                }else{
+                } else {
                     return {
                         ...item,
                         isOpen: !item.isOpen
                     }
                 }
-            }else{
+            } else {
                 return item;
             }
         });
@@ -204,7 +220,7 @@ function initEvent() {
     }).on('click', '.del-btn', function () {
         const configId = $(this).data('id');
         const currentConfigList = getCurrentConfig();
-        const currentConfigIdx = currentConfigList.findIndex(item=>item.id===configId);
+        const currentConfigIdx = currentConfigList.findIndex(item => item.id === configId);
         console.log('待删除元素：', currentConfigList, currentConfigIdx, configId);
         currentConfigList.splice(currentConfigIdx, 1);
 
@@ -218,7 +234,7 @@ function initEvent() {
         const key = $(this).data('key');
         const text = $(this).text();
         const currentConfigList = getCurrentConfig();
-        const oldConfigIdx = currentConfigList.findIndex(item=>item.id===id);
+        const oldConfigIdx = currentConfigList.findIndex(item => item.id === id);
         const oldConfig = currentConfigList[oldConfigIdx];
         oldConfig[key] = text;
         currentConfigList.splice(oldConfigIdx, 1, oldConfig);
@@ -229,25 +245,25 @@ function initEvent() {
     });
 
     $actionSelectAll.off('click').on('click', function () {
-        if(!isSelectAll){
+        if (!isSelectAll) {
             $configList.find('.list-item .checkout-box').addClass('checked');
-        }else{
+        } else {
             $configList.find('.list-item .checkout-box').removeClass('checked');
         }
         isSelectAll = !isSelectAll;
         $(this).find('.checkout-box').toggleClass('checked');
     });
 
-    $actionSelectOpen.off('click').on('click',function () {
+    $actionSelectOpen.off('click').on('click', function () {
         $configList.find('.list-item .checkout-box').removeClass('checked');
         $configList.find('.list-item .switch-btn.active').parents('.list-item').find('.checkout-box').addClass('checked');
     });
 
-    $actionReverse.off('click').on('click',function () {
+    $actionReverse.off('click').on('click', function () {
         $configList.find('.list-item .checkout-box').each(function (index, item) {
-            if($(item).hasClass('checked')){
+            if ($(item).hasClass('checked')) {
                 $(item).removeClass('checked');
-            }else{
+            } else {
                 $(item).addClass('checked');
             }
         })
@@ -280,10 +296,62 @@ function initEvent() {
 
     $favList.off('click').on('click', '.fav-list-item .del', function () {
         const favId = $(this).data('id');
-        const idx = favList.findIndex(item=>item.favId===favId);
+        const idx = favList.findIndex(item => item.favId === favId);
         favList.splice(idx, 1);
         bg.storageSet(favListKey, favList);
         init();
+    });
+
+    $showShortKeyModal.off('click').on('click', '.cancel-btn', function () {
+        hideShortKeyModal();
+    }).on('keydown', '.short-key-input', function (e) {
+        if (/[0-9a-z]/.test(e.key) && e.ctrlKey) {
+            const shortKey = parseShortKey(e);
+            currentKeyEvent = shortKey;
+            $(this).val(getShortKeyString(shortKey));
+        }else{
+            currentKeyEvent = null;
+        }
+        e.stopPropagation();
+    }).on('click', '.save-btn', function () {
+        if(currentKeyEvent){
+            const currentFavConfig = favList.find(item => item.favId === curActionFavId);
+            const currentFavConfigIdx = favList.findIndex(item => item.favId === curActionFavId);
+            currentFavConfig.shortKey = currentKeyEvent;
+            favList.splice(currentFavConfigIdx, 1, currentFavConfig);
+
+            bg.storageSet(favListKey, favList);
+
+            hideShortKeyModal();
+            init();
+        }else{
+            alert('请先输入快捷键');
+        }
+
+    });
+
+    $(document).off('keydown').on('keydown', function (e) {
+
+        console.log(e);
+
+        if (/[0-9a-z]/.test(e.key) && e.ctrlKey) {
+            const shortKey = parseShortKey(e);
+            console.log(shortKey);
+
+            const curKey = getShortKeyString(shortKey);
+
+            const target = favList.filter(item => !!item).find(item => getShortKeyString(item.shortKey) === curKey);
+
+            if(target){
+
+                updateCurrentFavId(target.favId);
+                init();
+            }
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
     });
 
     $menuBtn.mouseover(function () {
@@ -292,15 +360,59 @@ function initEvent() {
 }
 
 /**
+ * 显示设置快捷键的弹框
+ * @param favId
+ */
+function showShortKeyModal(favId) {
+    curActionFavId = favId;
+    $showShortKeyModal.fadeIn();
+}
+
+/**
+ * 隐藏设置快捷键的弹框
+ */
+function hideShortKeyModal() {
+    curActionFavId = "";
+    $showShortKeyModal.fadeOut();
+}
+
+/**
+ * 获取快捷键信息
+ * @param e
+ * @returns {{keyCode: number, shiftKey: boolean, metaKey: boolean, altKey: boolean}}
+ */
+function parseShortKey(e) {
+    return {
+        key: e.key,
+        altKey: e.altKey,
+        shiftKey: e.shiftKey,
+        metaKey: e.metaKey,
+        ctrlKey: e.ctrlKey
+    };
+}
+
+/**
+ * 将快捷键信息转为字符串
+ * @param shortKey
+ * @returns {string}
+ */
+function getShortKeyString(shortKey) {
+    if (!shortKey) {
+        return '右键单击可设置快捷键';
+    }
+    return `${shortKey.metaKey ? 'cmd + ' : ''}${shortKey.shift ? 'shift +' : ''}${shortKey.altKey ? 'alt + ' : ''}${shortKey.ctrlKey ? 'ctrl + ' : ''}${shortKey.key ? shortKey.key : ''}`;
+}
+
+/**
  * 开启或关闭给定配置数组的配置
  * @param configs
  * @param isOpen
  */
-function openOrCloseConfig(configs, isOpen){
+function openOrCloseConfig(configs, isOpen) {
     const currentConfigList = getCurrentConfig();
-    configs.forEach(openItem=>{
-        const idx = currentConfigList.findIndex(item=>item.id===openItem.id);
-        const cur = currentConfigList.find(item=>item.id===openItem.id);
+    configs.forEach(openItem => {
+        const idx = currentConfigList.findIndex(item => item.id === openItem.id);
+        const cur = currentConfigList.find(item => item.id === openItem.id);
         cur.isOpen = isOpen;
         currentConfigList.splice(idx, 1, cur);
     });
@@ -314,11 +426,11 @@ function openOrCloseConfig(configs, isOpen){
  * 删除给定配置输出的配置
  * @param configs
  */
-function delConfig(configs){
+function delConfig(configs) {
 
     const currentConfigList = getCurrentConfig();
-    configs.forEach(delItem=>{
-        const idx = currentConfigList.findIndex(item=>item.id===delItem.id);
+    configs.forEach(delItem => {
+        const idx = currentConfigList.findIndex(item => item.id === delItem.id);
         currentConfigList.splice(idx, 1);
     });
 
@@ -332,20 +444,20 @@ function delConfig(configs){
  * 获取所有选中的配置
  * @returns {(*|jQuery|number|bigint|U)[]}
  */
-function getAllSelectedItem(){
+function getAllSelectedItem() {
     const selectedIds = [];
     $configList.find('.list-item .checkout-box.checked').each(function (index, item) {
         selectedIds.push($(item).data("id"));
     });
     const currentConfigList = getCurrentConfig();
-    return selectedIds.map(id=>currentConfigList.find(item=>item.id===id));
+    return selectedIds.map(id => currentConfigList.find(item => item.id === id));
 }
 
 /**
  * 将当前配置保存在偏好设置中
  * @param config
  */
-function saveCurrentConfigAsFav(config){
+function saveCurrentConfigAsFav(config) {
     const uid = createUid();
 
     const name = window.prompt("请输入偏好配置名称", "");
@@ -357,7 +469,8 @@ function saveCurrentConfigAsFav(config){
         favId: uid,
         name,
         config: config,
-        timeStamp: Date.now()
+        timeStamp: Date.now(),
+        shortKey: {}
     });
 
     bg.storageSet(favListKey, favList);
@@ -367,11 +480,11 @@ function saveCurrentConfigAsFav(config){
 /**
  * 新增host配置
  */
-function doAddHost(){
+function doAddHost() {
     const form = $('#form').serializeArray();
     const config = parseObj(form);
     config.id = createUid();
-    config.tags.split(':').forEach(tag=>!tags.has(tag)&&tags.add(tag));
+    config.tags.split(':').forEach(tag => !tags.has(tag) && tags.add(tag));
 
     if (doValidate(config)) {
         const currentFavConfig = getCurrentConfig();
@@ -385,10 +498,10 @@ function doAddHost(){
  * 根据条件筛选
  * @param val
  */
-function filter(val){
-    if(!val){
+function filter(val) {
+    if (!val) {
         renderConfList();
-    }else{
+    } else {
         renderConfList(val);
     }
 }
@@ -402,6 +515,7 @@ function showAddHostPanel() {
     $configList.hide();
     $addHostPanel.show();
 }
+
 /**
  * 隐藏增加host配置面板
  */
@@ -415,16 +529,17 @@ function hideAddHostPanel() {
 /**
  * 显示输入csv文本的面板
  */
-function showConfigCsvInputPanel(){
+function showConfigCsvInputPanel() {
     $tagsPanel.hide();
     $toolsPanel.hide();
     $configList.hide();
     $inputCsvPanel.show();
 }
+
 /**
  * 隐藏输入csv文本的面板
  */
-function hideConfigCsvInputPanel(){
+function hideConfigCsvInputPanel() {
     $tagsPanel.show();
     $toolsPanel.show();
     $configList.show();
@@ -461,7 +576,8 @@ function createDefaultFav() {
             favId: createUid(),
             name: "默认偏好",
             config: [],
-            timeStamp: Date.now()
+            timeStamp: Date.now(),
+            shortKey: {}
         }
     ]
 }
@@ -471,12 +587,12 @@ function createDefaultFav() {
  */
 function initData(cb) {
     bg.storageGet([favListKey, currentFavIdKey, KinerSwitchHostGlobalConfig], [], function (res) {
-        favList = res[favListKey]||[];
-        if(favList.length===0){
+        favList = res[favListKey] || [];
+        if (favList.length === 0) {
             createDefaultFav();
         }
-        currentFavId = res[currentFavIdKey]||favList[0].favId;
-        globalSwitch = res[KinerSwitchHostGlobalConfig]||false;
+        currentFavId = res[currentFavIdKey] || favList[0].favId;
+        globalSwitch = res[KinerSwitchHostGlobalConfig] || false;
         initTags();
         console.log(res, favList, currentFavId);
         cb && cb();
@@ -486,7 +602,7 @@ function initData(cb) {
 /**
  * 更新全局开关
  */
-function updateGlobalSwitch(){
+function updateGlobalSwitch() {
     globalSwitch = !globalSwitch;
     bg.storageSet(KinerSwitchHostGlobalConfig, globalSwitch);
     renderGlobalSwitch();
@@ -506,9 +622,9 @@ function render() {
  * 渲染全局开关
  */
 function renderGlobalSwitch() {
-    if(globalSwitch){
+    if (globalSwitch) {
         $globalSwitch.addClass('active');
-    }else{
+    } else {
         $globalSwitch.removeClass('active');
     }
 }
@@ -525,7 +641,8 @@ function renderFavList() {
             favId: fav.favId,
             name: fav.name,
             idx: idx + 1,
-            date: dateFormat(fav.timeStamp, "YYYY-MM-DD HH:mm:ss")
+            date: dateFormat(fav.timeStamp, "YYYY-MM-DD HH:mm:ss"),
+            shortKey: getShortKeyString(fav.shortKey)
         });
     });
 
@@ -540,21 +657,21 @@ function renderConfList(val) {
     let html = '';
     let currentConfigList = getCurrentConfig();
     doProxy(currentConfigList);
-    const currentFav = favList.find(item=>item.favId===currentFavId);
-    if(currentFav){
+    const currentFav = favList.find(item => item.favId === currentFavId);
+    if (currentFav) {
         $favName.text(`${currentFav.name}`);
     }
-    if(val){
-        currentConfigList = currentConfigList.filter(item=>(item.name.includes(val) || item.domain.includes(val) || item.ip.includes(val) || item.tags.includes(val)));
+    if (val) {
+        currentConfigList = currentConfigList.filter(item => (item.name.includes(val) || item.domain.includes(val) || item.ip.includes(val) || item.tags.includes(val)));
     }
-    if(currentConfigList.length===0){
+    if (currentConfigList.length === 0) {
         $configList.addClass('no-record');
-    }else{
+    } else {
         $configList.removeClass('no-record');
     }
-    currentConfigList.forEach((conf, idx)=>{
+    currentConfigList.forEach((conf, idx) => {
         let bgColor = domainColor[conf.domain];
-        if(!bgColor){
+        if (!bgColor) {
             bgColor = domainColor[conf.domain] = colors[colorIdx++];
             if (colorIdx === colors.length - 1) {
                 colorIdx = 0;
@@ -563,8 +680,8 @@ function renderConfList(val) {
 
         html += updateTpl(listTpl, {
             id: conf.id,
-            idx: idx+1,
-            tags: conf.tags.split(':').map(item=>`<span class="tag">${item}</span>`).join(''),
+            idx: idx + 1,
+            tags: conf.tags.split(':').map(item => `<span class="tag">${item}</span>`).join(''),
             bgColor: bgColor,
             name: conf.name,
             domain: conf.domain,
@@ -590,7 +707,7 @@ function createUid() {
  */
 function renderTagList() {
     let html = '';
-    Array.from(tags).forEach(item=>{
+    Array.from(tags).forEach(item => {
         console.log(item);
         html += `<span class="tag">${item}</span>`;
     });
@@ -601,12 +718,12 @@ function renderTagList() {
  * 初始化tag数据
  */
 function initTags() {
-    if(!favList){
+    if (!favList) {
         return;
     }
     favList.forEach(item => {
         const config = item.config;
-        config.forEach(conf=>{
+        config.forEach(conf => {
             const configTags = (conf.tags || "").split(":");
             configTags.forEach(tag => {
                 if (!tags.has(tag)) {
@@ -658,7 +775,7 @@ function getFavConfigByFavId(favId) {
 function updateCurrentFavId(favId, config) {
     currentFavId = favId;
     bg.storageSet(currentFavIdKey, currentFavId);
-    if(config){
+    if (config) {
         updateFavConfigByFavId(favId, config, true);
     }
     render();
@@ -668,11 +785,11 @@ function updateCurrentFavId(favId, config) {
  * 获取当前配置
  * @returns {*}
  */
-function getCurrentConfig(){
+function getCurrentConfig() {
     const conf = getFavConfigByFavId(currentFavId);
-    if(conf){
+    if (conf) {
         return conf.config;
-    }else{
+    } else {
         return [];
     }
 
@@ -766,18 +883,17 @@ function doValidate(config) {
 }
 
 
-
 /**
  * 导入csv文本
  * @param csv
  */
-function importCsv(csv){
+function importCsv(csv) {
     csv = csv.trim();
     //显示文件内容
-    const arr = csv.split("\n").filter(item=>!item.includes(csvHeader.replace(/\n/g,''))).filter(item=>item.trim().length!==0);
+    const arr = csv.split("\n").filter(item => !item.includes(csvHeader.replace(/\n/g, ''))).filter(item => item.trim().length !== 0);
     const result = arr.map(item => {
         const vals = item.split(',');
-        vals[4].split(":").forEach(item=>!tags.has(item)&&tags.add(item));
+        vals[4].split(":").forEach(item => !tags.has(item) && tags.add(item));
         return {
             id: createUid(),
             name: vals[0],
@@ -800,13 +916,18 @@ function importCsv(csv){
  * @param cb
  * @returns {*}
  */
-function importFavJson(res, cb){
-    let json = {};
-    try{
+function importFavJson(res, cb) {
+    let json = [];
+    try {
         json = JSON.parse(res);
-    }catch (e) {
-        json = {};
+    } catch (e) {
+        json = [];
     }
+
+    json.map(item => ({
+        ...item,
+        shortKey: {}
+    }));
 
     favList = [...favList, ...json];
     bg.storageSet(favListKey, favList, function () {
@@ -845,13 +966,13 @@ function importJSONFile(file, cb) {
  * @param file
  * @param cb
  */
-function getFileContent(file, cb){
+function getFileContent(file, cb) {
     const reader = new FileReader();
     reader.onload = function () {
         const res = reader.result;
         if (res) {
             cb(res);
-        }else{
+        } else {
             alert('文件内容为空');
         }
     };
@@ -860,14 +981,14 @@ function getFileContent(file, cb){
 
 function createCsvText(config) {
     let txt = csvHeader;
-    txt+=config.map(item => `${item.name},${item.domain},${item.ip},${item.isOpen},${item.tags}`).join('\n');
+    txt += config.map(item => `${item.name},${item.domain},${item.ip},${item.isOpen},${item.tags}`).join('\n');
     return txt;
 }
 
-function preExport(){
-    const currentFav = favList.find(item=>item.favId===currentFavId);
+function preExport() {
+    const currentFav = favList.find(item => item.favId === currentFavId);
     const currentConfig = currentFav.config;
-    initDownloadLink($('#export'), `${currentFav.name}_${dateFormat(currentFav.timeStamp, "YYYY-MM-DD HH:mm:ss")}.csv`,'text/csv', createCsvText(currentConfig));
+    initDownloadLink($('#export'), `${currentFav.name}_${dateFormat(currentFav.timeStamp, "YYYY-MM-DD HH:mm:ss")}.csv`, 'text/csv', createCsvText(currentConfig));
     initDownloadLink($('#exportFav'), '偏好设置列表.json', 'text/json', JSON.stringify(favList, null, 4));
 }
 
@@ -878,7 +999,7 @@ function preExport(){
  * @param type
  * @param data
  */
-function initDownloadLink(target, fileName, type, data){
+function initDownloadLink(target, fileName, type, data) {
     data = "\ufeff" + data;
     const blob = new Blob([data], {type: `${type},charset=UTF-8`});
     const url = URL.createObjectURL(blob);
@@ -891,10 +1012,10 @@ function initDownloadLink(target, fileName, type, data){
  * 启动代理
  * @param hostList
  */
-function doProxy(hostList){
-    if(globalSwitch){
+function doProxy(hostList) {
+    if (globalSwitch) {
         bg.proxy(hostList);
-    }else{
+    } else {
         bg.cancelProxy();
     }
 
