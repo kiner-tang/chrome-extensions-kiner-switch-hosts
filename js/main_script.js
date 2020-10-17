@@ -637,6 +637,9 @@ function renderGlobalSwitch() {
     } else {
         $globalSwitch.removeClass('active');
     }
+
+    let currentConfigList = getCurrentConfig();
+    doProxy(currentConfigList);
 }
 
 /**

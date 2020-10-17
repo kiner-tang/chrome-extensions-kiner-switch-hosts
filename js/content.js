@@ -45,7 +45,7 @@ function doSendMessage(){
                 namespace = `${namespace}[${localConfig.name}]`;
                 localConfig = localConfig.config;
                 isOpen = response.isOpen;
-                // console.log(isOpen);
+                // console.log(response);
                 if(isOpen){
                     showLog();
                 }

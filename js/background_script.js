@@ -35,7 +35,7 @@ function storageGet(key, defaultVal, cb){
             info.list = result[stroageKey];
         }
         if(key.includes(KinerSwitchHostGlobalConfig)){
-            info.isOpen = result[stroageKey];
+            info.isOpen = result[KinerSwitchHostGlobalConfig];
         }
     });
 }
@@ -105,12 +105,13 @@ function cancelProxy(){
  * 初始化获取本地数据
  */
 storageGet([KinerSwitchHostGlobalConfig, stroageKey, currentFavIdKey], {},function (result) {
+
     info = {
         list: result[stroageKey],
         isOpen: result[KinerSwitchHostGlobalConfig],
         currentFavId: result[currentFavIdKey]
     };
-    console.log('--->', result)
+    console.log('--->', info)
 });
 
 // 监听消息
