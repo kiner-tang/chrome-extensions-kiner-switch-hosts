@@ -18,10 +18,17 @@ function showLog() {
 
 function log(messages) {
     const style = `font-size:1em; background: brown; color: #ffffff; padding: 5px 15px; border-radius: 5px; box-shadow: 0 0 5px #333;`;
+    const curStyle = 'color: green; background: #FFFFFF; border-radius: 5px; padding: 5px 15px;';
     console.groupCollapsed(namespace);
     if(messages.length===0){
         console.log(`%c【${namespace}】暂无开启的配置`, style);
     }else{
+        const cur = messages.filter(item=>item['域名'].includes(document.domain));
+        if(cur.length){
+            console.log(`%c【${namespace}】当前页面匹配配置：域名[${document.domain}] 指向IP: ${cur[0]["IP地址"]}`, curStyle);
+        }else{
+            console.log(`%c【${namespace}】未找到与当前页面域名匹配的配置`, curStyle);
+        }
         console.table(messages);
     }
 

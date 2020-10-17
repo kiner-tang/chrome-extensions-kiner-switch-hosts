@@ -19,6 +19,9 @@ function storageSet(key, val, cb){
     if(key===KinerSwitchHostGlobalConfig){
         info.isOpen = val;
     }
+    if(key===currentFavIdKey){
+        info.currentFavId = val;
+    }
 }
 
 /**
@@ -36,6 +39,9 @@ function storageGet(key, defaultVal, cb){
         }
         if(key.includes(KinerSwitchHostGlobalConfig)){
             info.isOpen = result[KinerSwitchHostGlobalConfig];
+        }
+        if(key.includes(currentFavIdKey)){
+            info.isOpen = result[currentFavIdKey];
         }
     });
 }
