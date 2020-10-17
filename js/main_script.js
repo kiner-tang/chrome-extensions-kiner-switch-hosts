@@ -193,6 +193,14 @@ function initEvent() {
     $configList.off('click').on('click', '.list-item .checkbox', function () {
         const $checkbox = $(this).find('.checkout-box');
         $checkbox.toggleClass('checked');
+        console.log($configList.find('.checkout-box.checked').length, $configList.find('.checkout-box').length);
+        if($configList.find('.checkout-box.checked').length===$configList.find('.checkout-box').length){
+            isSelectAll = true;
+            $actionSelectAll.find('.checkout-box').addClass('checked');
+        }else{
+            isSelectAll = false;
+            $actionSelectAll.find('.checkout-box').removeClass('checked');
+        }
     }).on('click', '.list-item .switch-btn', function () {
         const configId = $(this).data('id');
         let currentConfigList = getCurrentConfig();
@@ -334,7 +342,7 @@ function initEvent() {
 
     $(document).off('keydown').on('keydown', function (e) {
 
-        console.log(e);
+        // console.log(e);
 
         if (/[0-9a-z]/.test(e.key) && e.ctrlKey && e.target.nodeName !== "INPUT" && e.target.nodeName !== "TEXTAREA") {
             const shortKey = parseShortKey(e);
