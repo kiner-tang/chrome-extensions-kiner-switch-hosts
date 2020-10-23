@@ -41,7 +41,7 @@ function storageGet(key, defaultVal, cb){
             info.isOpen = result[KinerSwitchHostGlobalConfig];
         }
         if(key.includes(currentFavIdKey)){
-            info.isOpen = result[currentFavIdKey];
+            info.currentFavId = result[currentFavIdKey];
         }
     });
 }
